@@ -103,7 +103,7 @@ refs.toCabinetBtn.addEventListener('click', openBackdrop);
 
 function onBtnClick(e) {
   event.preventDefault();
-
+  canPlay();
   const target = e.target;
 
   if (target.nodeName === 'DIV') {
@@ -122,51 +122,53 @@ function onBtnClick(e) {
   }
 }
 
+function createResult(delay) {
+  return new Promise(res => {
+    setTimeout(() => {
+      const randomElement = Math.floor(
+        Math.random() * (3 + currentModeKof - 1) + 1
+      );
+      res(elements[randomElement]);
+    }, delay * 500);
+  });
+}
+
 function onStart() {
-  waitingAttention();
-  disableButton();
-  resetFields();
+  refs.btnContainerEl.removeEventListener('click', onBtnClick);
   currentMoney -= currentGameCost;
+  const result = [];
+
+  disableButton();
+  waitingAttention();
+  resetFields();
+
   refreshCurrentMoney();
   refreshLocalStorage();
 
-  const result = new Promise((res, rej) => {
-    setTimeout(() => {
-      [...refs.containerEl.children].forEach(box => {
-        const randomElement = Math.floor(
-          Math.random() * (3 + currentModeKof - 1) + 1
-        );
+  [...refs.containerEl.children].forEach((box, i) => {
+    createResult(i)
+      .then(value => {
+        box.textContent = value;
+        result.push(value);
+      })
+      .finally(() => {
+        if (result.length !== [...refs.containerEl.children].length) {
+          return;
+        }
 
-        box.innerHTML = elements[randomElement];
+        if (result.every(element => element === result[0])) {
+          const prize = currentModeKof * 10 * currentGameCost;
+          currentMoney += prize;
+          attentionWin(prize);
+          refreshCurrentMoney();
+          refreshLocalStorage();
+        } else {
+          attentionLose();
+        }
+
+        canPlay();
       });
-
-      if (
-        [...refs.containerEl.children].every(
-          box =>
-            box.textContent === refs.containerEl.firstElementChild.textContent
-        )
-      ) {
-        const prize = currentGameCost * 10 * currentModeKof;
-        currentMoney += prize;
-        attentionWin(prize);
-
-        res('Wohoo');
-      } else {
-        attentionLose();
-        rej('Error');
-      }
-    }, 500);
   });
-  result
-    .then(res => res)
-    .catch(rej => rej)
-    .finally(() => {
-      refreshCurrentMoney();
-      refreshLocalStorage();
-      checkCurrentBalance();
-      currentGamePrice();
-      canPlay();
-    });
 }
 
 function refreshCurrentMoney() {
@@ -177,6 +179,17 @@ function refreshLocalStorage() {
   localStorage.setItem('currentBalance', currentMoney);
 }
 
+function checkKofBtn() {
+  [...refs.btnContainerEl.querySelectorAll('.kof-btn')]
+    .filter(element => element.classList.contains('kof-btn'))
+    .forEach(btn => {
+      if (currentMoney < btn.dataset.kof * BASE_PRICE) {
+        disableBtn(btn);
+      } else {
+        enableBtn(btn);
+      }
+    });
+}
 function disableButton() {
   refs.startBtn.setAttribute('disabled', 'disabled');
   refs.startBtn.classList.remove('active');
@@ -205,14 +218,19 @@ function currentGamePrice() {
 
 function canPlay() {
   refreshCurrentGameCost();
-
-  if (currentGameCost > currentMoney) {
+  if (currentMoney < BASE_PRICE) {
+    refs.btnContainerEl.removeEventListener('click', onBtnClick);
+    refs.moneyEl.classList.add('lose');
+  } else if (currentGameCost > currentMoney) {
     disableButton();
     refs.moneyEl.classList.add('lose');
+    refs.btnContainerEl.addEventListener('click', onBtnClick);
   } else {
+    refs.btnContainerEl.addEventListener('click', onBtnClick);
     refs.moneyEl.classList.remove('lose');
     enableButton();
   }
+  checkKofBtn();
 }
 
 function refreshCurrentGameCost() {
@@ -254,6 +272,8 @@ function attentionToStart() {
   } else {
     refs.statusEl.textContent = `Press on button to check you luck`;
   }
+  refs.statusEl.classList.remove('win');
+  refs.statusEl.classList.remove('lose');
 }
 
 function attentionWin(prize) {
@@ -286,7 +306,7 @@ function openBackdrop() {
   refs.backdropEl.classList.remove('is-hidden');
   hideElement(refs.cabinetEl);
   showElement(refs.policyContainerEl);
-  let currnetTimeWaiting = 5;
+  let currnetTimeWaiting = 1;
   refs.timePolicyEl.textContent = currnetTimeWaiting;
   const interval = setInterval(() => {
     currnetTimeWaiting -= 1;
@@ -334,6 +354,7 @@ function onEscBackdrop() {
 }
 
 function closeBackdrop() {
+  canPlay();
   attentionToStart();
   refs.formEl.removeEventListener('input', onInputChange);
   refs.formEl.removeEventListener('submit', onSubmit);
