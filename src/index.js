@@ -22,6 +22,7 @@ const refs = {
 };
 
 const BASE_PRICE = 100;
+const BASE_WIN_KOF = 5;
 let currentKof = 1;
 let currentGameCost;
 let currentModeKof = 1;
@@ -98,7 +99,19 @@ function onStart() {
         }
 
         if (result.every(element => element === result[0])) {
-          const prize = currentModeKof * 10 * currentGameCost;
+          const prize = currentModeKof * BASE_WIN_KOF * currentGameCost;
+          currentMoney += prize;
+          attentionWin(prize);
+          refreshCurrentMoney();
+          refreshLocalStorage();
+        } else if (result[0] === result[1] || result[1] === result[2]) {
+          let prize;
+          if (currentModeKof === 1) {
+            prize = currentGameCost;
+          } else {
+            prize = currentGameCost + currentGameCost / 2;
+          }
+          console.log(prize);
           currentMoney += prize;
           attentionWin(prize);
           refreshCurrentMoney();
