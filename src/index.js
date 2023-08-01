@@ -1,62 +1,3 @@
-//! Микропроцессы имеют больший приоритет, чем макро
-
-//? Микропроцессі
-//* 1 Promises
-//* 2 Observer
-
-//? Макпропроцессы
-//* 1 setTimeout
-//* 2 setInterval
-//* 3 setImmediate
-//* 4 requestAnimationFrame
-
-//? Пример приоритетов 1
-/*console.log('1');
-setTimeout(() => console.log('2'), 10);
-Promise.resolve('3').then(value => console.log(value));
-Promise.reject('4')
-  .then(value => console.log(value))
-  .catch(err => console.log(err));
-Promise.resolve('5').then(value => console.log(value));
-setTimeout(() => console.log('6'), 0);
-console.log('7');*/
-//! 1,7,3,5,4,6,2 (Промис с режекстом имеет меньше приоритет, чем промис с резолвом)
-
-//? Пример приоритетов 2
-
-/*console.log('1');
-setTimeout(() => {
-  Promise.resolve('2').then(value => console.log(value));
-  console.log('3');
-}, 0);
-console.log('4');*/
-//!1,4,3,2
-
-//*Promises
-/*const promise = new Promise((res, rej) => {
-  const random = Math.random();
-  setTimeout(() => {
-    if (random > 0.5) {
-      res('Great!!!');
-    } else {
-      rej('Sorry, error');
-    }
-  }, 3000);
-});
-
-console.log(promise);
-
-promise
-  .then(message => console.log(message))
-  .catch(error => console.error(error))
-  .finally(() => console.log('Promise is ending'));*/
-
-//* fetch
-
-/*const pokemon = fetch('https://pokeapi.co/api/v2/pokemon/1').then(resp =>
-  resp.json()
-);
-pokemon.then(resp => console.log(resp));*/
 import 'animate.css';
 //* Casino 777
 const refs = {
@@ -306,7 +247,7 @@ function openBackdrop() {
   refs.backdropEl.classList.remove('is-hidden');
   hideElement(refs.cabinetEl);
   showElement(refs.policyContainerEl);
-  let currnetTimeWaiting = 1;
+  let currnetTimeWaiting = 5;
   refs.timePolicyEl.textContent = currnetTimeWaiting;
   const interval = setInterval(() => {
     currnetTimeWaiting -= 1;
