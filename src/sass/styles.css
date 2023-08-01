@@ -48,10 +48,14 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: tomato;
-    color: white;
+    background-color: white;
+    
 }
 
+.current-game-price {
+    margin-top: 20px;
+    font-size: 26px;
+}
 .button-container {
     margin-left: auto;
     margin-right: auto;
@@ -66,7 +70,7 @@ button {
     color: white;
     display: block;
  
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 

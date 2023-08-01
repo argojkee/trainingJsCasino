@@ -22,7 +22,7 @@ const refs = {
 };
 
 const BASE_PRICE = 100;
-const BASE_WIN_KOF = 5;
+const BASE_WIN_KOF = 10;
 let currentKof = 1;
 let currentGameCost;
 let currentModeKof = 1;
@@ -38,24 +38,29 @@ currentGamePrice();
 canPlay();
 resetFields();
 
-const elements = ['0', '1', '2', '3', '4'];
+const elements = [
+  '0',
+  '\u{1F34D}',
+  '\u{1F34C}',
+  '\u{1F34E}',
+  '\u{1F347}',
+  '\u{1F353}',
+  '\u{1F352}',
+];
 
 refs.btnContainerEl.addEventListener('click', onBtnClick);
 refs.toCabinetBtn.addEventListener('click', openBackdrop);
 
 function onBtnClick(e) {
   event.preventDefault();
-  canPlay();
+
   const target = e.target;
 
   if (target.nodeName === 'DIV') {
     return;
   }
 
-  if (
-    target.classList.contains('js-button') ||
-    target.classList.contains('current-total')
-  ) {
+  if (target.classList.contains('js-button')) {
     onStart();
   } else if (target.classList.contains('kof-btn')) {
     onKofSelect(target);
@@ -68,7 +73,7 @@ function createResult(delay) {
   return new Promise(res => {
     setTimeout(() => {
       const randomElement = Math.floor(
-        Math.random() * (3 + currentModeKof - 1) + 1
+        Math.random() * (5 + currentModeKof - 1) + 1
       );
       res(elements[randomElement]);
     }, delay * 500);
@@ -104,7 +109,11 @@ function onStart() {
           attentionWin(prize);
           refreshCurrentMoney();
           refreshLocalStorage();
-        } else if (result[0] === result[1] || result[1] === result[2]) {
+        } else if (
+          result[0] === result[1] ||
+          result[1] === result[2] ||
+          result[0] === result[2]
+        ) {
           let prize;
           if (currentModeKof === 1) {
             prize = currentGameCost;
@@ -120,7 +129,9 @@ function onStart() {
           attentionLose();
         }
 
-        canPlay();
+        setTimeout(() => {
+          canPlay();
+        }, 500);
       });
   });
 }
@@ -203,7 +214,6 @@ function checkCurrentBalance() {
 function onModeSelect(btn) {
   removeCurrentBtn(btn);
   currentBtn(btn);
-
   currentModeKof = Number(btn.dataset.mode);
 }
 
