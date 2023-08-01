@@ -211,7 +211,7 @@ function attentionToStart() {
   if (currentMoney < BASE_PRICE) {
     refs.statusEl.innerHTML = `Please enter in your cabinet and up your balance to start. Minimum game price : <span style="color: rgb(0, 0, 255);">${BASE_PRICE}</span> credits`;
   } else {
-    refs.statusEl.textContent = `Press on button to check you luck`;
+    refs.statusEl.textContent = `Press on button to check your luck`;
   }
   refs.statusEl.classList.remove('win');
   refs.statusEl.classList.remove('lose');
